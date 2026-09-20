@@ -39,6 +39,48 @@ app.get("/clientes/:id", async (req, res) => {
   }
 });
 
+app.post("/clientes", async (req, res) => {
+  const { nome, sobrenome, telefone, email } = req.body;
+
+  if (!nome) {
+    return res.status(400).json({
+      erro: "Nome é obrigatório",
+    });
+  }
+
+  if (!sobrenome) {
+    return res.status(400).json({
+      erro: "Sobrenome é obrigatório",
+    });
+  }
+
+  if (!telefone) {
+    return res.status(400).json({
+      erro: "Telefone é obrigatório",
+    });
+  }
+
+  if (!email) {
+    return res.status(400).json({
+      erro: "Emaile é obrigatório",
+    });
+  }
+
+  try {
+    const resultado = await db.query(
+      `INSERT INTO cliente (nome, sobrenome, telefone, email)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [nome, sobrenome, telefone, email],
+    );
+
+    res.status(201).json(resultado.rows[0]);
+  } catch (erro) {
+    res.status(500).json({
+      erro: "Erro ao criar cliente",
+    });
+  }
+});
 
 async function criarTabela() {
   await db.query(`
