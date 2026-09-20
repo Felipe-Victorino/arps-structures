@@ -15,6 +15,7 @@ services:
       - "3002:3002"
     environment:
       PRODUTOS_URL: http://produtos:3001
+      CLIENTES_URL: http://clientes:3003
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/pedidos_db
     depends_on:
       postgres:
@@ -29,9 +30,9 @@ services:
     ports:
      - "3003:3003"
     environment:
-      CLIENTES_URL: http://clientes:3003
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/clientes_db
     depends_on:
-      - postgres:
+      postgres:
         condition: service_healthy
 
   gateway:
@@ -41,9 +42,11 @@ services:
     environment:
       PRODUTOS_URL: http://produtos:3001
       PEDIDOS_URL: http://pedidos:3002
+      CLIENTES_URL: http://clientes:3003
     depends_on:
       - produtos
       - pedidos
+      - clientes
 
   postgres:
     image: postgres:16-alpine
