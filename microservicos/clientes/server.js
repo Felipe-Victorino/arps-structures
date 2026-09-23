@@ -68,7 +68,7 @@ app.post("/clientes", async (req, res) => {
 
   try {
     const resultado = await db.query(
-      `INSERT INTO cliente (nome, sobrenome, telefone, email)
+      `INSERT INTO clientes (nome, sobrenome, telefone, email)
        VALUES ($1, $2, $3, $4)
        RETURNING *`,
       [nome, sobrenome, telefone, email],
