@@ -10,12 +10,28 @@ Content-Type: application/json
 ### Listar produtos
 GET http://localhost:3000/produtos
 
+### Criar cliente
+POST http://localhost:3000/clientes
+Content-Type: application/json
+
+{
+  "nome": "Maria",
+  "sobrenome": "da Silva",
+  "telefone": "11999999998",
+  "email": "maria@email.com"
+}
+
+### Listar clientes
+GET http://localhost:3000/clientes
+
+
 ### Criar pedido
 POST http://localhost:3000/pedidos
 Content-Type: application/json
 
 {
-  "produtoId": 2,
+  "produtoId": 1,
+  "clienteId": 1,
   "quantidade": 2
 }
 
