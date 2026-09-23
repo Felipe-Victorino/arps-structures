@@ -3,8 +3,8 @@ POST http://localhost:3000/produtos
 Content-Type: application/json
 
 {
-  "nome": "Mouse",
-  "preco": 80
+  "nome": "Laptop",
+  "preco": 3200
 }
 
 ### Listar produtos
@@ -15,24 +15,26 @@ POST http://localhost:3000/clientes
 Content-Type: application/json
 
 {
-  "nome": "Maria",
-  "sobrenome": "da Silva",
+  "nome": "Laura",
+  "sobrenome": "Palmas",
   "telefone": "11999999998",
-  "email": "maria@email.com"
+  "email": "palma@email.com"
 }
 
 ### Listar clientes
 GET http://localhost:3000/clientes
 
+###Listar clientes por id
+GET http://localhost:3000/clientes/1
 
 ### Criar pedido
 POST http://localhost:3000/pedidos
 Content-Type: application/json
 
 {
-  "produtoId": 1,
-  "clienteId": 1,
-  "quantidade": 2
+  "produtoId": 3,
+  "clienteId": 4,
+  "quantidade": 10
 }
 
 ### Listar pedidos
