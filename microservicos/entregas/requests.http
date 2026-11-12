@@ -1,0 +1,24 @@
+### Listar entregas
+GET http://localhost:3004/entregas
+
+### Buscar entrega por ID
+GET http://localhost:3004/entregas/1
+
+### Buscar entrega por pedido
+GET http://localhost:3004/entregas/pedido/1
+
+### Criar entrega
+POST http://localhost:3004/entregas
+Content-Type: application/json
+
+{
+  "pedidoId": 1,
+  "endereco": "Av. Paulista"
+}
+### Atualizar entrega
+PUT htt://localhost:3004/entregas/:id/status
+Content-Type: application/json
+
+{
+  "status": "ENVIADO"
+}
