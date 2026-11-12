@@ -5,6 +5,7 @@ npm-debug.log*
 # Variáveis de ambiente
 .env
 .env.*
+*.env
 
 # IDEs
 .vscode/
