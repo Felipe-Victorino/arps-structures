@@ -11,6 +11,8 @@ const PEDIDOS_URL = process.env.PEDIDOS_URL || "http://localhost:3002";
 
 const CLIENTES_URL = process.env.CLIENTES_URL || "http://localhost:3003";
 
+const ENTREGAS_URL = process.env.ENTREGAS_URL || "http://localhost:3004";
+
 app.use("/produtos", async (req, res) => {
   try {
     const resposta = await axios({
@@ -73,6 +75,28 @@ app.use("/pedidos", async (req, res) => {
 
     return res.status(503).json({
       erro: "Serviço de Pedidos indisponível",
+    });
+  }
+});
+
+app.use("/entregas", async (req, res) => {
+  try {
+    const resposta = await axios({
+      method: req.method,
+      url: `${ENTREGAS_URL}${req.originalUrl}`,
+      data: req.body,
+      params: req.query,
+      timeout: 5000,
+    });
+
+    res.status(resposta.status).json(resposta.data);
+  } catch (erro) {
+    if (erro.response) {
+      return res.status(erro.response.status).json(erro.response.data);
+    }
+
+    return res.status(503).json({
+      erro: "Serviço de Entregas indisponível",
     });
   }
 });
