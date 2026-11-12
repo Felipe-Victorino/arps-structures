@@ -38,10 +38,11 @@ app.get("/pedidos", async (req, res) => {
 
 app.get("/pedidos/:id", async (req, res) => {
   try {
+    console.log(`Finding by id: ${req.params.id}`);
     const resultado = await Pedido.findById(req.params.id);
-
-    const pedido = resultado.rows[0];
-
+    console.log(resultado)
+    const pedido = resultado;
+    
     if (!pedido) {
       return res.status(404).json({
         erro: "Pedido não encontrado",
@@ -51,7 +52,7 @@ app.get("/pedidos/:id", async (req, res) => {
     res.json(pedido);
   } catch (erro) {
     res.status(500).json({
-      erro: "Erro ao buscar pedido",
+      erro: erro.message,
     });
   }
 });
@@ -78,9 +79,12 @@ app.post("/pedidos", async (req, res) => {
   }
 
   try {
-    const res_produto = await axios.get(`${PRODUTOS_URL}/produtos/${produtoId}`, {
-      timeout: 3000,
-    });
+    const res_produto = await axios.get(
+      `${PRODUTOS_URL}/produtos/${produtoId}`,
+      {
+        timeout: 3000,
+      },
+    );
 
     const res_cliente = await axios.get(
       `${CLIENTES_URL}/clientes/${clienteId}`,
@@ -103,7 +107,6 @@ app.post("/pedidos", async (req, res) => {
     });
 
     res.status(201).json(pedido);
-    
   } catch (erro) {
     if (erro.response?.status === 404) {
       return res.status(400).json({
