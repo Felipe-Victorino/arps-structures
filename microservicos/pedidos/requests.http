@@ -12,4 +12,4 @@ Content-Type: application/json
 }
 
 ### Buscar pedido por ID
-GET http://localhost:3002/pedidos/1
+GET http://localhost:3002/pedidos/6af4f2df125ac6ed31b1423a
