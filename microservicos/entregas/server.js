@@ -7,15 +7,15 @@ const app = express();
 
 app.use(express.json());
 
-const PEDIDOS_URL = process.env.PEDIDOS_URL || "https://localhost:3002"
+const PEDIDOS_URL = process.env.PEDIDOS_URL || "https://localhost:3002";
 
 connectDB();
 
 const entregaSchema = new mongoose.Schema({
-  pedido_id: Number,
+  pedido_id: mongoose.ObjectId,
   endereco: String,
   status: String,
-  codigo_rastreio: Number,
+  codigo_rastreio: String,
 });
 
 const entregaStatusEnum = {
@@ -23,8 +23,8 @@ const entregaStatusEnum = {
   ENVIADO: "ENVIADO",
   EM_TRANSITO: "EM_TRANSITO",
   ENTREGUE: "ENTREGUE",
-  CANCELADO: "CANCELADO"
-}
+  CANCELADO: "CANCELADO",
+};
 
 const Entrega = mongoose.model("Entrega", entregaSchema);
 
@@ -44,7 +44,7 @@ app.get("/entregas/:id", async (req, res) => {
   try {
     const resultado = await Entrega.findById(req.params.id);
 
-    const entrega = resultado.rows[0];
+    const entrega = resultado;
 
     if (!entrega) {
       return res.status(404).json({
@@ -64,7 +64,7 @@ app.get("/entregas/pedido/:pedido_id", async (req, res) => {
   try {
     const resultado = await Entrega.find({ pedido_id: req.params.id });
 
-    const entrega = resultado.rows[0];
+    const entrega = resultado;
 
     if (!entrega) {
       return res.status(404).json({
@@ -78,41 +78,48 @@ app.get("/entregas/pedido/:pedido_id", async (req, res) => {
       erro: "Erro ao buscar pedido da entrega",
     });
   }
-  
-})
+});
 
 app.post("/entregas", async (req, res) => {
-  const {pedidoId, endereco} = req.body;
+  const { pedidoId, endereco } = req.body;
 
-  if(!pedidoId){
+  if (!pedidoId) {
     return res.status(400).json({
       erro: "pedidoId é obrigatório",
     });
   }
 
-  if(!endereco){
+  if (!endereco) {
     return res.status(400).json({
       erro: "Endereço é obrigatório",
     });
   }
 
-  try{
-    const res_pedido = await axios.get(`${PEDIDOS_URL}/pedidos/${pedidoId}`, 
-      {
-        timeout:3000
-      }
-    );
+  
+  try {
+    const res_pedido = await axios.get(`${PEDIDOS_URL}/pedidos/${pedidoId}`, {
+      timeout: 3000,
+    });
+
+    if(!res_pedido){
+      return res.status(404).json({
+        erro: "Pedido inexistente",
+      });
+    }
+
 
     const pedido = res_pedido.data;
 
+    console.log(pedido);
+
     const entrega = await Entrega.create({
-      pedido_id: pedido.id,
+      pedido_id: pedido._id,
       endereco,
       status: entregaStatusEnum.PREPARANDO,
-      codigo_rastreio: crypto.randomUUID()
+      codigo_rastreio: crypto.randomUUID().toString(),
     });
 
-    res.status(201).json(entrega)
+    res.status(201).json(entrega);
 
   } catch (erro) {
     if (erro.response?.status === 404) {
@@ -131,7 +138,7 @@ app.post("/entregas", async (req, res) => {
       erro: erro.message,
     });
   }
-})
+});
 
 app.put("/entregas/:id/status", async (req, res) => {
   const { status } = req.body;
@@ -142,42 +149,42 @@ app.put("/entregas/:id/status", async (req, res) => {
     });
   }
 
-  if(
-    ![entregaStatusEnum.CANCELADO, 
-      entregaStatusEnum.EM_TRANSITO, 
-      entregaStatusEnum.ENTREGUE, 
-      entregaStatusEnum.ENVIADO, 
-      entregaStatusEnum.PREPARANDO].includes(status)
-    ){
+  if (
+    ![
+      entregaStatusEnum.CANCELADO,
+      entregaStatusEnum.EM_TRANSITO,
+      entregaStatusEnum.ENTREGUE,
+      entregaStatusEnum.ENVIADO,
+      entregaStatusEnum.PREPARANDO,
+    ].includes(status)
+  ) {
+    return res.status(400).json({
+      erro: "Status não tem valor possível",
+    });
+  }
+
+  const id = req.params.id;
+
+  try {
+    const entrega = await Entrega.findOneAndUpdate(
+      { _id: id },
+      { $set: { status: status } },
+      { returnDocument: "after", runValidators: true },
+    );
+
+    res.status(200).json(entrega);
+  } catch (erro) {
+    if (erro.response?.status === 404) {
       return res.status(400).json({
-        erro: "Status não tem valor possível",
-      });
-    }
-
-    const id = req.params.id;
-
-    try{
-      const entrega = await Entrega.findOneAndUpdate(
-        {_id: id},
-        {$set: {status: status} },
-        {new: true, runValidators: true}
-      )
-
-      res.status(200).json(entrega);
-
-    } catch (erro) {
-      if (erro.response?.status === 404) {
-        return res.status(400).json({
-          erro: erro.message,
-        });
-      }
-
-      return res.status(500).json({
         erro: erro.message,
       });
     }
-  
-})
+
+    return res.status(500).json({
+      erro: erro.message,
+    });
+  }
+});
 
 app.listen(3004, () => {
   console.log("Entregas rodando na porta 3004");
