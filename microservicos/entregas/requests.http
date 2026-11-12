@@ -2,21 +2,22 @@
 GET http://localhost:3004/entregas
 
 ### Buscar entrega por ID
-GET http://localhost:3004/entregas/1
+GET http://localhost:3004/entregas/6af5c4550bef3d20392aa204
 
 ### Buscar entrega por pedido
-GET http://localhost:3004/entregas/pedido/1
+GET http://localhost:3004/entregas/pedido/6af4f2df125ac6ed31b1423a
 
 ### Criar entrega
 POST http://localhost:3004/entregas
 Content-Type: application/json
 
 {
-  "pedidoId": 1,
+  "pedidoId": "6af4f2df125ac6ed31b1423a",
   "endereco": "Av. Paulista"
 }
+
 ### Atualizar entrega
-PUT htt://localhost:3004/entregas/:id/status
+PUT http://localhost:3004/entregas/6af5c4550bef3d20392aa204/status
 Content-Type: application/json
 
 {
